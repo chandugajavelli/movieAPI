@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+
 
 
 
@@ -29,7 +29,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 @RequestMapping("/api/admin")
 public class AdminController {
 
-    public final RestTemplate restTemplate = new RestTemplate();
+    public  RestTemplate restTemplate = new RestTemplate();
 
     @Value("${movie-service.url}")
     private String movieServiceUrl;
@@ -38,7 +38,6 @@ public class AdminController {
 
     @PostMapping("/add")
     public ResponseEntity<?> addMovie(@RequestBody Movie movie) {
-        //TODO: process POST request
         try{
         log.info("adding movie");
         Movie savedMovie = restTemplate.postForObject(movieServiceUrl, movie, Movie.class);
@@ -86,14 +85,18 @@ public class AdminController {
         Rating rating;
 
         try{
-        rating = restTemplate.getForObject(movieServiceUrl+"/"+movie.getName(),Rating.class);
+        if (movie != null) {
+            rating = restTemplate.getForObject(ratingServiceUrl+"/"+movie.getName(),Rating.class);
+        } else {
+            rating = new Rating(null, null, -1, -1); // handle null movie case
+        }
         }
         catch(HttpStatusCodeException ex){
             if(ex.getStatusCode() == HttpStatus.NOT_FOUND){
-                rating = new Rating(null,movie.getName(),0.0,0);
+                rating = new Rating(null,movie != null ? movie.getName() : null,0.0,0);
             }
             else  
-                rating = new Rating(null,movie.getName(),-1,-1);  //if rating service is down
+                rating = new Rating(null,movie != null ? movie.getName() : null,-1,-1);  //if rating service is down
         }
 
 

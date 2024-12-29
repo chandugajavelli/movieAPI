@@ -9,13 +9,13 @@ import com.chandu.api_gateway.model.RatingRequest;
 
 import lombok.extern.slf4j.Slf4j;
 
-import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 
 
 @RestController
@@ -23,14 +23,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping("/api/public")
 public class PublicController {
 
-     @Value("${rating-service.url}")
+    @Value("${rating-service.url}")
     private String ratingServiceUrl;
 
-    @Autowired
-    RestTemplate restTemplate;
-
+    
+    RestTemplate restTemplate = new RestTemplate();
+    @PutMapping("/updateRating")
     public ResponseEntity<Object> updateRating(@RequestBody RatingRequest ratingRequest) {
-        //TODO: process POST request
 
         try{
       Rating rating =  restTemplate.postForObject(ratingServiceUrl, ratingRequest, Rating.class);
